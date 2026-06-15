@@ -44,8 +44,9 @@ def filter_melanoma_miraclib_pbmc(df):
     print(f"Filtered to {filtered_df['subject'].nunique()} subjects, {filtered_df['sample'].nunique()} samples")
     return filtered_df
 
-def plot_response_boxplots(df):
+def plot_response_boxplots(df, save=False):
     populations = df["population"].unique()
+    figures = {}
 
     for pop in populations:
         plot_df = df[df["population"] == pop]
@@ -66,9 +67,13 @@ def plot_response_boxplots(df):
             }
         )
         fig.update_layout(showlegend=False)
-        fig.write_image(f"output/boxplot_{pop}.png")
+        figures[pop] = fig
 
-        print(f"Boxplot saved to output/boxplot_{pop}.png")
+        if save:
+            fig.write_image(f"output/boxplot_{pop}.png")
+            print(f"Boxplot saved to output/boxplot_{pop}.png")
+
+    return figures
 
 def compute_statistics(df):
     results = []
@@ -160,7 +165,9 @@ def main():
 
     # Filter query results to melanoma patients treated with miraclib and PBMC samples
     melanoma_miraclib_pbmc_df = filter_melanoma_miraclib_pbmc(freq_df)
-    plot_response_boxplots(melanoma_miraclib_pbmc_df)
+
+    # Create boxplots comparing responders vs non-responders for each cell population and save as images
+    plot_response_boxplots(melanoma_miraclib_pbmc_df, save=True)
 
     # Perform Mann-Whitney U test comparing responders vs non-responders for each cell population
     stats_df = compute_statistics(melanoma_miraclib_pbmc_df)
