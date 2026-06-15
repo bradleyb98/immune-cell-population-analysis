@@ -1,8 +1,9 @@
 setup:
-	@echo "Install dependencies"
+	pip install -r requirements.txt
 
 pipeline:
-	@echo "Execute pipeline"
+	python load_data.py
+	python analysis.py
 
 dashboard:
-	@echo "Create interactive dashboard"
+	streamlit run dashboard.py
