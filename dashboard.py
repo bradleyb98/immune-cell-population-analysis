@@ -1,5 +1,7 @@
 import streamlit as st
 import sqlite3
+import os
+import subprocess
 from analysis import (
     calculate_frequencies,
     create_summary,
@@ -8,6 +10,11 @@ from analysis import (
     compute_statistics,
     analyze_baseline_samples
 )
+
+# Build database if it doesn't exist (for Streamlit Cloud deployment)
+if not os.path.exists("cell_count.db"):
+    subprocess.run(["python", "load_data.py"], check=True)
+    subprocess.run(["python", "analysis.py"], check=True)
 
 # Utility function to display DataFrames with index starting at 1
 def display_df(df):
