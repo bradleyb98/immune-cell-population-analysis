@@ -1,7 +1,5 @@
 import streamlit as st
 import sqlite3
-import pandas as pd
-import plotly.express as px
 from analysis import (
     calculate_frequencies,
     create_summary,

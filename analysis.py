@@ -26,12 +26,14 @@ def calculate_frequencies(conn):
     print(f"Calculated relative frequencies for {freq_df['sample'].nunique()} samples")
     return freq_df
 
-def create_summary(df):
+def create_summary(df, save=False):
     summary_cols = ["sample", "total_count", "population", "count", "percentage"]
     summary_df = df[summary_cols].copy()
-    summary_df.to_csv("output/summary_table.csv", index=False)
 
-    print("Summary table created at output/summary_table.csv")
+    if save:
+        summary_df.to_csv("output/summary_table.csv", index=False)
+        print("Summary table created at output/summary_table.csv")
+
     return summary_df
 
 def filter_melanoma_miraclib_pbmc(df):
@@ -75,7 +77,7 @@ def plot_response_boxplots(df, save=False):
 
     return figures
 
-def compute_statistics(df):
+def compute_statistics(df, save=False):
     results = []
     populations = df["population"].unique()
 
@@ -94,9 +96,11 @@ def compute_statistics(df):
             "significant": p_value < 0.05
         })
     stats_df = pd.DataFrame(results)
-    stats_df.to_csv("output/stats_summary.csv", index=False)
 
-    print("Statistical summary saved to output/stats_summary.csv")
+    if save:
+        stats_df.to_csv("output/stats_summary.csv", index=False)
+        print("Statistical summary saved to output/stats_summary.csv")
+
     return stats_df
 
 def analyze_baseline_samples(conn):
@@ -161,7 +165,7 @@ def main():
     freq_df = calculate_frequencies(conn)
 
     # Create summary table with sample, total count, population, count, and percentage
-    summary_df = create_summary(freq_df)
+    summary_df = create_summary(freq_df, save=True)
     print(summary_df.head(20))
 
     # Filter query results to melanoma patients treated with miraclib and PBMC samples
@@ -171,7 +175,7 @@ def main():
     plot_response_boxplots(melanoma_miraclib_pbmc_df, save=True)
 
     # Perform Mann-Whitney U test comparing responders vs non-responders for each cell population
-    stats_df = compute_statistics(melanoma_miraclib_pbmc_df)
+    stats_df = compute_statistics(melanoma_miraclib_pbmc_df, save=True)
     print(stats_df)
 
     # Query to identify all melanoma PBMC samples at baseline from patients treated with miraclib
