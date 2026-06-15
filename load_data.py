@@ -56,7 +56,7 @@ def load_csv(filepath):
 
 
 def validate_data(df):
-    # 1.) Check for required columns
+    # Check for required columns
     required_columns = [
         "project", "subject", "condition", "age", "sex",
         "treatment", "response", "sample", "sample_type",
@@ -67,17 +67,17 @@ def validate_data(df):
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
     
-    # 2.) Check for nulls in ID columns
+    # Check for nulls in ID columns
     id_cols = ["project", "subject", "sample"]
     for col in id_cols:
         if df[col].isnull().any():
             raise ValueError(f"Null values found in required column: {col}")
         
-    # 3.) Check for duplicate sample IDs
+    # Check for duplicate sample IDs
     if df["sample"].duplicated().any():
         raise ValueError("Duplicate sample IDs found")
     
-    # 4.) Check for valid cell counts (non-negative integers)
+    # Check for valid cell counts (non-negative integers)
     count_cols = ["b_cell", "cd8_t_cell", "cd4_t_cell", "nk_cell", "monocyte"]
     if (df[count_cols] < 0).any().any():
         raise ValueError("Negative cell counts found")
@@ -95,7 +95,7 @@ def extract_tables(df):
     subjects = df[["subject", "project", "condition", "age", "sex", "treatment", "response"]].drop_duplicates()
 
     # samples table: sample IDs with their associated subject and metadata
-    samples = df[["sample", "subject", "sample_type", "time_from_treatment_start"]]
+    samples = df[["sample", "subject", "sample_type", "time_from_treatment_start"]].drop_duplicates()
 
     # counts table: transform from wide to long format: one row per sample + cell population with associated count
     counts = df.melt(
@@ -115,14 +115,15 @@ def insert_data(conn, projects, subjects, samples, counts):
     print("Data inserted into database")
 
 def main():
-    # Connect to SQLite (creates database if it doesn't exist)
+    # Connect to database
     conn = sqlite3.connect("cell_count.db")
     cursor = conn.cursor()
-    # Enforce foreign key constraints
-    cursor.execute("PRAGMA foreign_keys = ON")
+    cursor.execute("PRAGMA foreign_keys = ON") # Enforce foreign key constraints
 
+    # Create tables
     create_tables(cursor)
 
+    # Load, validate, and insert data
     df = load_csv("data/cell-count.csv")
     validate_data(df)
     projects, subjects, samples, counts = extract_tables(df)
