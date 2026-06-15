@@ -52,21 +52,21 @@ Four normalized tables:
 
 ### Design Decisions & Rationale
 
-- **Long format for `counts` table:** cell population counts are stored in long format (one row per sample per population) rather than wide format (one column per population). This means 5 rows per sample rather than 1, but eliminates the need to reshape data for downstream analysis as the frequency table (Part 2) and boxplot/statistics (Part 3) both require long-format data natively. Adding new cell populations requires only new rows, not schema changes.
+- **`projects` table:** included despite having only one column to enforce referential integrity and provide a natural foundation for project-level metadata (sponsor, start date, therapeutic area) without schema restructuring.
 
 - **`response` and `treatment` on `subjects`:** inspection of the data shows these values are constant across all timepoints for each subject, consistent with them being trial-level outcome assessments rather than per-sample measurements. In an adaptive trial design they might belong on `samples` instead.
 
-- **Composite primary key on `counts`:** `PRIMARY KEY (sample, population)` serves dual purpose — uniquely identifying each row and enforcing the constraint that each sample can only have one count per population.
+- **Nullable `age` and `sex`:** real clinical data may have missing demographics; subjects should remain in the dataset even with incomplete metadata.
+
+- **Long format for `counts` table:** cell population counts are stored in long format (one row per sample per population) rather than wide format (one column per population). This means 5 rows per sample rather than 1, but eliminates the need to reshape data for downstream analysis as the frequency table (Part 2) and boxplot/statistics (Part 3) both require long-format data natively. Adding new cell populations requires only new rows, not schema changes.
 
 - **`cell_population` CHECK constraint:** the `counts` table validates known population names at load time (`b_cell`, `cd8_t_cell`, `cd4_t_cell`, `nk_cell`, `monocyte`). Adding new populations requires updating this constraint and rerunning the pipeline — acceptable at current scale but could be replaced with a separate `populations` lookup table in a larger system.
 
-- **`projects` table:** included despite having only one column to enforce referential integrity and provide a natural foundation for project-level metadata (sponsor, start date, therapeutic area) without schema restructuring.
-
-- **`PRAGMA foreign_keys = ON`:** SQLite does not enforce foreign key constraints by default — explicitly enabled in `load_data.py`.
+- **Composite primary key on `counts`:** `PRIMARY KEY (sample, population)` uniquely identifies each row and enforces the constraint that each sample can only have one count per population.
 
 - **`DROP TABLE IF EXISTS` before `CREATE TABLE`:** rerunning `make pipeline` always produces a clean rebuild with no duplicate rows.
 
-- **Nullable `age` and `sex`:** real clinical data may have missing demographics; subjects should remain in the dataset even with incomplete metadata.
+- **`PRAGMA foreign_keys = ON`:** SQLite does not enforce foreign key constraints by default — explicitly enabled in `load_data.py`.
 
 ### Scaling Considerations
 
@@ -111,15 +111,3 @@ Auto-builds database on first run if not present (for cloud deployment).
 - **Test used:** Mann-Whitney U (non-parametric, two-sided) — appropriate for comparing two independent groups without assuming normal distribution
 - **Finding:** cd4_t_cell populations reached statistical significance (p = 0.013) between responders and non-responders; all other populations did not
 - **Limitation:** subjects contribute 3 data points each (one per timepoint), meaning observations are not fully independent — a more rigorous analysis would use a mixed effects model accounting for repeated measures. This approach is appropriate for exploratory pattern identification.
-
----
-
-## Dashboard
-
-[Link to live dashboard](https://immune-cell-population-analysis.streamlit.app/)
-
-To run locally:
-```bash
-make dashboard
-```
-Opens at `http://localhost:8501`
