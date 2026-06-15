@@ -12,7 +12,18 @@ from analysis import (
 )
 
 # Build database if it doesn't exist (for Streamlit Cloud deployment)
-if not os.path.exists("cell_count.db"):
+def database_is_ready():
+    if not os.path.exists("cell_count.db"):
+        return False
+    conn = sqlite3.connect("cell_count.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='counts'")
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+if not database_is_ready():
+    os.makedirs("output", exist_ok=True)
     subprocess.run(["python", "load_data.py"], check=True)
     subprocess.run(["python", "analysis.py"], check=True)
 
