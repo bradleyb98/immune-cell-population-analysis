@@ -24,28 +24,20 @@ make dashboard  # Launch interactive dashboard at localhost:8501
 
 ## Project Structure
 
+```
 immune-cell-population-analysis/
-├── load_data.py        # Database schema creation and CSV loading (Part 1)
-
-├── analysis.py         # Frequency analysis, statistics, and subset queries (Parts 2-4)
-
-├── dashboard.py        # Interactive Streamlit dashboard
-
-├── Makefile            # Pipeline automation
-
-├── requirements.txt    # Python dependencies
-
+├── load_data.py
+├── analysis.py
+├── dashboard.py
+├── Makefile
+├── requirements.txt
 ├── data/
-
-│   └── cell-count.csv  # Source data
-
+│   └── cell-count.csv
 └── output/
-
     ├── summary_table.csv
-
     ├── stats_summary.csv
-    
     └── boxplot_*.png
+```
 
 ---
 
