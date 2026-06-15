@@ -1,4 +1,42 @@
-# immune-cell-population-analysis
+# Immune Cell Population Analysis
+
+An end-to-end clinical trial data pipeline and interactive dashboard for analyzing immune cell population frequencies across patient cohorts treated with miraclib and phauximab.
+
+**Live Dashboard:** [link](https://immune-cell-population-analysis.streamlit.app/)
+
+---
+
+## Setup & Usage
+
+### Requirements
+- Python 3.12+
+- Dependencies listed in `requirements.txt`
+
+### Running the Pipeline
+
+```bash
+make setup      # Install dependencies
+make pipeline   # Initialize database, load data, run analysis
+make dashboard  # Launch interactive dashboard at localhost:8501
+```
+
+---
+
+## Project Structure
+
+immune-cell-population-analysis/
+├── load_data.py        # Database schema creation and CSV loading (Part 1)
+├── analysis.py         # Frequency analysis, statistics, and subset queries (Parts 2-4)
+├── dashboard.py        # Interactive Streamlit dashboard
+├── Makefile            # Pipeline automation
+├── requirements.txt    # Python dependencies
+├── data/
+│   └── cell-count.csv  # Source data
+└── output/
+    ├── summary_table.csv
+    ├── stats_summary.csv
+    └── boxplot_*.png
+
 ---
 
 ## Database Schema
