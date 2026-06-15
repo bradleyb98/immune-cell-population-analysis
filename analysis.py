@@ -172,7 +172,7 @@ def main():
     melanoma_miraclib_pbmc_df = filter_melanoma_miraclib_pbmc(freq_df)
 
     # Create boxplots comparing responders vs non-responders for each cell population and save as images
-    plot_response_boxplots(melanoma_miraclib_pbmc_df, save=True)
+    plot_response_boxplots(melanoma_miraclib_pbmc_df, save=False)
 
     # Perform Mann-Whitney U test comparing responders vs non-responders for each cell population
     stats_df = compute_statistics(melanoma_miraclib_pbmc_df, save=True)
