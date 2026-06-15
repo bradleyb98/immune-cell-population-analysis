@@ -2,6 +2,7 @@ import streamlit as st
 import sqlite3
 import os
 import subprocess
+import sys
 from analysis import (
     calculate_frequencies,
     create_summary,
@@ -24,8 +25,8 @@ def database_is_ready():
 
 if not database_is_ready():
     os.makedirs("output", exist_ok=True)
-    subprocess.run(["python", "load_data.py"], check=True)
-    subprocess.run(["python", "analysis.py"], check=True)
+    subprocess.run([sys.executable, "load_data.py"], check=True)
+    subprocess.run([sys.executable, "analysis.py"], check=True)
 
 # Utility function to display DataFrames with index starting at 1
 def display_df(df):
