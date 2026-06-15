@@ -149,8 +149,9 @@ def analyze_baseline_samples(conn):
         """
     avg_bcell_df = pd.read_sql_query(query, conn)
     avg_bcell = avg_bcell_df["avg_b_cell"].iloc[0]
-
     print(f"\nAverage B cells (melanoma males, responders, time=0): {avg_bcell}")
+
+    return baseline_df, samples_per_project, responders_non_responders, males_females
 
 def main():
     # Connect to database
